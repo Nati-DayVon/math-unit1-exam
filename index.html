@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>የ10ኛ ክፍል የሂሳብ ፈተና - ዩኒት 1 (Ultimate Luxury Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #02040a;
+            --bg-card: rgba(13, 17, 23, 0.92);
+            --border-gold: rgba(212, 175, 55, 0.4);
+            --border-gold-hover: rgba(212, 175, 55, 0.9);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-gold: #d4af37;
+            --accent-gold-light: #fef08a;
+            --gold-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            --glow-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+            --correct-color: #22c55e;
+            --wrong-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(180, 140, 40, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 0%, #02040a 100%);
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .layout-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .layout-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ፕሪሚየም የጎን ማውጫ (Sidebar Navigator) */
+        .sidebar {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 25px;
+            height: fit-content;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            position: sticky;
+            top: 20px;
+        }
+
+        .timer-box {
+            text-align: center;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid var(--border-gold);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .timer-display {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-gold-light);
+            margin-top: 5px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 8px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        .nav-btn.answered {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--correct-color);
+            color: #4ade80;
+        }
+
+        /* ዋናው የፈተና መያዣ (Main Content Container) */
+        .container {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), var(--glow-shadow);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* የሂደት ባር (Progress Bar) */
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--gold-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            background: rgba(18, 24, 38, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-gold);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .options-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .options-group {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(10, 15, 25, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .option-label:hover {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: var(--border-gold);
+        }
+
+        .option-label input {
+            margin-right: 12px;
+            accent-color: var(--accent-gold);
+            transform: scale(1.2);
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px dashed var(--accent-gold);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--accent-gold-light);
+            line-height: 1.5;
+        }
+
+        .correct-ans {
+            background: rgba(34, 197, 94, 0.2) !important;
+            border-color: var(--correct-color) !important;
+            color: #4ade80 !important;
+            font-weight: 600;
+        }
+
+        .wrong-ans {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: var(--wrong-color) !important;
+            color: #f87171 !important;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-submit {
+            background: var(--gold-gradient);
+            color: #0b0f19;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 16px 45px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.5);
+        }
+
+        /* ሰርተፍኬት እና ውጤት ሞዳል (Certificate Modal) */
+        #result-modal {
+            display: none;
+            margin-top: 30px;
+            padding: 35px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid var(--accent-gold);
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        #result-modal h3 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-gold-light);
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ፊርማ ክፍል (Signature Section) */
+        .signature-section {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .signature-brand {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .signature-box {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            font-weight: 800;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        <!-- የጎን ማውጫ እና ሰዓት ቆጣሪ -->
+        <div class="sidebar">
+            <div class="timer-box">
+                <span style="font-size: 12px; color: var(--text-muted);">የቀረ ጊዜ (Time Left)</span>
+                <div class="timer-display" id="timer">30:00</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--accent-gold);">የጥያቄዎች ማውጫ (Navigator)</div>
+            <div class="nav-grid" id="navGrid">
+                <!-- በ JavaScript በኩል በራስ ሰር ይሞላል -->
+            </div>
+        </div>
+
+        <!-- ዋናው ፈተና የሚካሄድበት ቦታ -->
+        <div class="container">
+            <header>
+                <h1>የ10ኛ ክፍል የሂሳብ ፈተና</h1>
+                <p class="subtitle">ዩኒት 1፡ ግንኙነቶች እና ተግባራት (Relations and Functions)</p>
+                <div style="margin-top: 10px; font-size: 13px; color: var(--accent-gold-light);">ጠቅላላ ጥያቄዎች፡ 30 | ፕሪሚየም የብቃት ምዘና</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </header>
+
+            <form id="examForm">
+
+                <!-- 30ቱ ጥያቄዎች (ሙሉ በሙሉ ተካተዋል) -->
+                <div class="question-box" id="box-q1">
+                    <div class="question-title">1. $A = \{1, 2\}$ እና $B = \{3, 4, 5\}$ ቢሰጡ የካርቲዚያን ምርት $A \times B$ የንጥረ ነገሮች (Elements) ብዛት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q1-A"><input type="radio" name="q1" value="A" onclick="markAnswer(1)"> A) 5</label>
+                        <label class="option-label" id="lbl-q1-B"><input type="radio" name="q1" value="B" onclick="markAnswer(1)"> B) 6</label>
+                        <label class="option-label" id="lbl-q1-C"><input type="radio" name="q1" value="C" onclick="markAnswer(1)"> C) 9</label>
+                        <label class="option-label" id="lbl-q1-D"><input type="radio" name="q1" value="D" onclick="markAnswer(1)"> D) 8</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q1">💡 <b>ማብራሪያ:</b> $n(A \times B) = n(A) \times n(B) = 2 \times 3 = 6$ ስለሆነ መልሱ B ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q2">
+                    <div class="question-title">2. የግንኙነት $R = \{(1, 2), (3, 4), (5, 6)\}$ ዴራይን (Domain) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q2-A"><input type="radio" name="q2" value="A" onclick="markAnswer(2)"> A) \{2, 4, 6\}</label>
+                        <label class="option-label" id="lbl-q2-B"><input type="radio" name="q2" value="B" onclick="markAnswer(2)"> B) \{1, 3, 5\}</label>
+                        <label class="option-label" id="lbl-q2-C"><input type="radio" name="q2" value="C" onclick="markAnswer(2)"> C) \{1, 2, 3, 4, 5, 6\}</label>
+                        <label class="option-label" id="lbl-q2-D"><input type="radio" name="q2" value="D" onclick="markAnswer(2)"> D) \{3, 4, 5\}</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q2">💡 <b>ማብራሪያ:</b> የዴራይን ስብስብ የመጀመሪያዎቹ (x) አስተባባሪዎች ስብስብ ሲሆን $\{1, 3, 5\}$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q3">
+                    <div class="question-title">3. የግንኙነት $R = \{(2, 5), (3, 7), (4, 9)\}$ ክልል (Range) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q3-A"><input type="radio" name="q3" value="A" onclick="markAnswer(3)"> A) \{2, 3, 4\}</label>
+                        <label class="option-label" id="lbl-q3-B"><input type="radio" name="q3" value="B" onclick="markAnswer(3)"> B) \{2, 5, 7, 9\}</label>
+                        <label class="option-label" id="lbl-q3-C"><input type="radio" name="q3" value="C" onclick="markAnswer(3)"> C) \{5, 7, 9\}</label>
+                        <label class="option-label" id="lbl-q3-D"><input type="radio" name="q3" value="D" onclick="markAnswer(3)"> D) ሁሉም</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q3">💡 <b>ማብራሪያ:</b> ክልል (Range) የሁለተኛው (y) አስተባባሪዎች ስብስብ ሲሆን $\{5, 7, 9\}$ ይሆናል።</div>
+                </div>
+
+                <div class="question-box" id="box-q4">
+                    <div class="question-title">4. የ $R = \{(x, y): y = 2x + 1\}$ ግንኙነት ተቃራኒ ግንኙነት ($R^{-1}$) እኩልታ የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q4-A"><input type="radio" name="q4" value="A" onclick="markAnswer(4)"> A) $y = \frac{x - 1}{2}$</label>
+                        <label class="option-label" id="lbl-q4-B"><input type="radio" name="q4" value="B" onclick="markAnswer(4)"> B) $y = 2x - 1$</label>
+                        <label class="option-label" id="lbl-q4-C"><input type="radio" name="q4" value="C" onclick="markAnswer(4)"> C) $y = \frac{x + 1}{2}$</label>
+                        <label class="option-label" id="lbl-q4-D"><input type="radio" name="q4" value="D" onclick="markAnswer(4)"> D) $y = \frac{1}{2}x$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q4">💡 <b>ማብራሪያ:</b> $x$ እና $y$ ን ሲቀያይሩ $y = \frac{x-1}{2}$ ይመጣል።</div>
+                </div>
+
+                <div class="question-box" id="box-q5">
+                    <div class="question-title">5. ከሚከተሉት ግንኙነቶች መካከል ተግባር (Function) የሆነው የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q5-A"><input type="radio" name="q5" value="A" onclick="markAnswer(5)"> A) \{(1, 2), (1, 3), (2, 4)\}</label>
+                        <label class="option-label" id="lbl-q5-B"><input type="radio" name="q5" value="B" onclick="markAnswer(5)"> B) \{(1, 2), (2, 3), (3, 4)\}</label>
+                        <label class="option-label" id="lbl-q5-C"><input type="radio" name="q5" value="C" onclick="markAnswer(5)"> C) \{(2, 5), (2, 6), (3, 7)\}</label>
+                        <label class="option-label" id="lbl-q5-D"><input type="radio" name="q5" value="D" onclick="markAnswer(5)"> D) \{(4, 1), (4, 2), (5, 3)\}</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q5">💡 <b>ማብራሪያ:</b> በ B ውስጥ ያሉት የ x እሴቶች ፈጽሞ አልተደጋገሙም።</div>
+                </div>
+
+                <div class="question-box" id="box-q6">
+                    <div class="question-title">6. የተግባር $f(x) = \sqrt{x - 4}$ ዴራይን (Domain) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q6-A"><input type="radio" name="q6" value="A" onclick="markAnswer(6)"> A) $x > 4$</label>
+                        <label class="option-label" id="lbl-q6-B"><input type="radio" name="q6" value="B" onclick="markAnswer(6)"> B) $x \geq 4$</label>
+                        <label class="option-label" id="lbl-q6-C"><input type="radio" name="q6" value="C" onclick="markAnswer(6)"> C) $x \leq 4$</label>
+                        <label class="option-label" id="lbl-q6-D"><input type="radio" name="q6" value="D" onclick="markAnswer(6)"> D) ሁሉም እውነተኛ ቁጥሮች</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q6">💡 <b>ማብራሪያ:</b> $x - 4 \geq 0 \implies x \geq 4$ ይሆናል።</div>
+                </div>
+
+                <div class="question-box" id="box-q7">
+                    <div class="question-title">7. የተግባር $f(x) = \frac{5}{x - 2}$ ዴራይን ከየትኞቹ የቁጥር ስብስቦች ውጪ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q7-A"><input type="radio" name="q7" value="A" onclick="markAnswer(7)"> A) $x = 0$</label>
+                        <label class="option-label" id="lbl-q7-B"><input type="radio" name="q7" value="B" onclick="markAnswer(7)"> B) $x = -2$</label>
+                        <label class="option-label" id="lbl-q7-C"><input type="radio" name="q7" value="C" onclick="markAnswer(7)"> C) $x = 2$</label>
+                        <label class="option-label" id="lbl-q7-D"><input type="radio" name="q7" value="D" onclick="markAnswer(7)"> D) $x = 5$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q7">💡 <b>ማብራሪያ:</b> ተካፋዩ ዜሮ መሆን ስለማይችል $x = 2$ ከዴራይኑ ውጪ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q8">
+                    <div class="question-title">8. የተግባር $f(x) = 3x^2 - 2x + 1$ ዋጋ $f(-2)$ ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q8-A"><input type="radio" name="q8" value="A" onclick="markAnswer(8)"> A) 9</label>
+                        <label class="option-label" id="lbl-q8-B"><input type="radio" name="q8" value="B" onclick="markAnswer(8)"> B) 13</label>
+                        <label class="option-label" id="lbl-q8-C"><input type="radio" name="q8" value="C" onclick="markAnswer(8)"> C) 17</label>
+                        <label class="option-label" id="lbl-q8-D"><input type="radio" name="q8" value="D" onclick="markAnswer(8)"> D) 15</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q8">💡 <b>ማብራሪያ:</b> $3(-2)^2 - 2(-2) + 1 = 12 + 4 + 1 = 17$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q9">
+                    <div class="question-title">9. የ $f(x) = 4x - 5$ ተቃራኒ ተግባር $f^{-1}(x)$ ማስተካከያ የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q9-A"><input type="radio" name="q9" value="A" onclick="markAnswer(9)"> A) $\frac{x + 5}{4}$</label>
+                        <label class="option-label" id="lbl-q9-B"><input type="radio" name="q9" value="B" onclick="markAnswer(9)"> B) $\frac{x - 5}{4}$</label>
+                        <label class="option-label" id="lbl-q9-C"><input type="radio" name="q9" value="C" onclick="markAnswer(9)"> C) $4x + 5$</label>
+                        <label class="option-label" id="lbl-q9-D"><input type="radio" name="q9" value="D" onclick="markAnswer(9)"> D) $\frac{4}{x + 5}$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q9">💡 <b>ማብራሪያ:</b> $y = \frac{x+5}{4}$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q10">
+                    <div class="question-title">10. $f(x) = x + 3$ እና $g(x) = 2x$ ቢሰጡ የ $(f + g)(x)$ እሴት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q10-A"><input type="radio" name="q10" value="A" onclick="markAnswer(10)"> A) $2x^2 + 3x$</label>
+                        <label class="option-label" id="lbl-q10-B"><input type="radio" name="q10" value="B" onclick="markAnswer(10)"> B) $3x + 3$</label>
+                        <label class="option-label" id="lbl-q10-C"><input type="radio" name="q10" value="C" onclick="markAnswer(10)"> C) $2x + 6$</label>
+                        <label class="option-label" id="lbl-q10-D"><input type="radio" name="q10" value="D" onclick="markAnswer(10)"> D) $x + 5$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q10">💡 <b>ማብራሪያ:</b> $(x + 3) + 2x = 3x + 3$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q11">
+                    <div class="question-title">11. $f(x) = x^2$ እና $g(x) = x - 1$ ቢሰጡ የ $(f \cdot g)(2)$ እሴት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q11-A"><input type="radio" name="q11" value="A" onclick="markAnswer(11)"> A) 2</label>
+                        <label class="option-label" id="lbl-q11-B"><input type="radio" name="q11" value="B" onclick="markAnswer(11)"> B) 4</label>
+                        <label class="option-label" id="lbl-q11-C"><input type="radio" name="q11" value="C" onclick="markAnswer(11)"> C) 6</label>
+                        <label class="option-label" id="lbl-q11-D"><input type="radio" name="q11" value="D" onclick="markAnswer(11)"> D) 8</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q11">💡 <b>ማብራሪያ:</b> $f(2) = 4$ እና $g(2) = 1$ በመሆኑ $4 \times 1 = 4$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q12">
+                    <div class="question-title">12. የኮምፖዚት ተግባር $(f \circ g)(x)$ ትክክለኛው ትርጉም የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q12-A"><input type="radio" name="q12" value="A" onclick="markAnswer(12)"> A) $f(x) \cdot g(x)$</label>
+                        <label class="option-label" id="lbl-q12-B"><input type="radio" name="q12" value="B" onclick="markAnswer(12)"> B) $f(g(x))$</label>
+                        <label class="option-label" id="lbl-q12-C"><input type="radio" name="q12" value="C" onclick="markAnswer(12)"> C) $g(f(x))$</label>
+                        <label class="option-label" id="lbl-q12-D"><input type="radio" name="q12" value="D" onclick="markAnswer(12)"> D) $\frac{f(x)}{g(x)}$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q12">💡 <b>ማብራሪያ:</b> $f(g(x))$ የኮምፖዚት ተግባር ትክክለኛ አጻጻፍ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q13">
+                    <div class="question-title">13. $f(x) = 2x + 1$ እና $g(x) = x - 3$ ቢሰጡ የ $(f \circ g)(2)$ እሴት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q13-A"><input type="radio" name="q13" value="A" onclick="markAnswer(13)"> A) -1</label>
+                        <label class="option-label" id="lbl-q13-B"><input type="radio" name="q13" value="B" onclick="markAnswer(13)"> B) 3</label>
+                        <label class="option-label" id="lbl-q13-C"><input type="radio" name="q13" value="C" onclick="markAnswer(13)"> C) 5</label>
+                        <label class="option-label" id="lbl-q13-D"><input type="radio" name="q13" value="D" onclick="markAnswer(13)"> D) 7</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q13">💡 <b>ማብራሪያ:</b> $g(2) = -1$ እና $f(-1) = -1$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q14">
+                    <div class="question-title">14. የሊኒየር ተግባር (Linear Function) ግራፍ ቅርጽ ምን ይመስላል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q14-A"><input type="radio" name="q14" value="A" onclick="markAnswer(14)"> A) ፓራቦላ (Parabola)</label>
+                        <label class="option-label" id="lbl-q14-B"><input type="radio" name="q14" value="B" onclick="markAnswer(14)"> B) ቀጥተኛ መስመር (Straight Line)</label>
+                        <label class="option-label" id="lbl-q14-C"><input type="radio" name="q14" value="C" onclick="markAnswer(14)"> C) ክብ (Circle)</label>
+                        <label class="option-label" id="lbl-q14-D"><input type="radio" name="q14" value="D" onclick="markAnswer(14)"> D) ሃይፐርቦላ (Hyperbola)</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q14">💡 <b>ማብራሪያ:</b> የሊኒየር ተግባር ግራፍ ቀጥተኛ መስመር ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q15">
+                    <div class="question-title">15. የኳድራቲክ ተግባር $f(x) = ax^2 + bx + c$ ($a \neq 0$) ግራፍ ቅርጽ ምን ይባላል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q15-A"><input type="radio" name="q15" value="A" onclick="markAnswer(15)"> A) ቀጥተኛ መስመር</label>
+                        <label class="option-label" id="lbl-q15-B"><input type="radio" name="q15" value="B" onclick="markAnswer(15)"> B) ፓራቦላ (Parabola)</label>
+                        <label class="option-label" id="lbl-q15-C"><input type="radio" name="q15" value="C" onclick="markAnswer(15)"> C) ኤልፕስ (Ellipse)</label>
+                        <label class="option-label" id="lbl-q15-D"><input type="radio" name="q15" value="D" onclick="markAnswer(15)"> D) ኩርባ ነጥብ</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q15">💡 <b>ማብራሪያ:</b> የኳድራቲክ ተግባር ግራፍ ፓራቦላ ይባላል።</div>
+                </div>
+
+                <div class="question-box" id="box-q16">
+                    <div class="question-title">16. የቋሚ ተግባር (Constant Function) $f(x) = 7$ ክልል (Range) ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q16-A"><input type="radio" name="q16" value="A" onclick="markAnswer(16)"> A) ሁሉም እውነተኛ ቁጥሮች</label>
+                        <label class="option-label" id="lbl-q16-B"><input type="radio" name="q16" value="B" onclick="markAnswer(16)"> B) \{7\}</label>
+                        <label class="option-label" id="lbl-q16-C"><input type="radio" name="q16" value="C" onclick="markAnswer(16)"> C) ከ 7 በላይ</label>
+                        <label class="option-label" id="lbl-q16-D"><input type="radio" name="q16" value="D" onclick="markAnswer(16)"> D) ባዶ ስብስብ</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q16">💡 <b>ማብራሪያ:</b> ክልሉ $\{7\}$ ብቻ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q17">
+                    <div class="question-title">17. የማንነት ተግባር (Identity Function) $f(x) = x$ ዴራይን እና ክልል ምን ይባላል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q17-A"><input type="radio" name="q17" value="A" onclick="markAnswer(17)"> A) አወንታዊ ቁጥሮች ብቻ</label>
+                        <label class="option-label" id="lbl-q17-B"><input type="radio" name="q17" value="B" onclick="markAnswer(17)"> B) ዜሮ ብቻ</label>
+                        <label class="option-label" id="lbl-q17-C"><input type="radio" name="q17" value="C" onclick="markAnswer(17)"> C) ሁሉም እውነተኛ ቁጥሮች ($\mathbb{R}$)</label>
+                        <label class="option-label" id="lbl-q17-D"><input type="radio" name="q17" value="D" onclick="markAnswer(17)"> D) የተፈጥሮ ቁጥሮች</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q17">💡 <b>ማብራሪያ:</b> ሁሉም እውነተኛ ቁጥሮች ($\mathbb{R}$) ናቸው።</div>
+                </div>
+
+                <div class="question-box" id="box-q18">
+                    <div class="question-title">18. አንድ ተግባር አንድ-ለ-አንድ (One-to-one / Injective) የሚሆነው መቼ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q18-A"><input type="radio" name="q18" value="A" onclick="markAnswer(18)"> A) የተለዩ ግብዓቶች የተለዩ ውጤቶች ሲኖራቸው</label>
+                        <label class="option-label" id="lbl-q18-B"><input type="radio" name="q18" value="B" onclick="markAnswer(18)"> B) ሁሉም ውጤቶች አንድ ሲሆኑ</label>
+                        <label class="option-label" id="lbl-q18-C"><input type="radio" name="q18" value="C" onclick="markAnswer(18)"> C) ክልሉ ከዜሮ በታች ሲሆን</label>
+                        <label class="option-label" id="lbl-q18-D"><input type="radio" name="q18" value="D" onclick="markAnswer(18)"> D) ግራፉ ቀጥተኛ መስመር ሲሆን</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q18">💡 <b>ማብራሪያ:</b> የተለዩ ግብዓቶች የተለዩ ውጤቶች ሲኖራቸው።</div>
+                </div>
+
+                <div class="question-box" id="box-q19">
+                    <div class="question-title">19. የ $f(x) = x^3$ ተግባር አንድ-ለ-አንድ (One-to-one) ነው ወይስ አይደለም?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q19-A"><input type="radio" name="q19" value="A" onclick="markAnswer(19)"> A) አዎ፣ አንድ-ለ-አንድ ነው።</label>
+                        <label class="option-label" id="lbl-q19-B"><input type="radio" name="q19" value="B" onclick="markAnswer(19)"> B) አይደለም</label>
+                        <label class="option-label" id="lbl-q19-C"><input type="radio" name="q19" value="C" onclick="markAnswer(19)"> C) ቋሚ ተግባር ነው።</label>
+                        <label class="option-label" id="lbl-q19-D"><input type="radio" name="q19" value="D" onclick="markAnswer(19)"> D) መወሰን አይቻልም</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q19">💡 <b>ማብራሪያ:</b> አዎ፣ አንድ-ለ-አንድ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q20">
+                    <div class="question-title">20. የፍጹም ዋጋ ተግባር (Absolute Value Function) $f(x) = |x|$ ክልል (Range) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q20-A"><input type="radio" name="q20" value="A" onclick="markAnswer(20)"> A) ሁሉም እውነተኛ ቁጥሮች</label>
+                        <label class="option-label" id="lbl-q20-B"><input type="radio" name="q20" value="B" onclick="markAnswer(20)"> B) አሉታዊ ቁጥሮች ብቻ</label>
+                        <label class="option-label" id="lbl-q20-C"><input type="radio" name="q20" value="C" onclick="markAnswer(20)"> C) $y \geq 0$ (አሉታዊ ያልሆኑ እውነተኛ ቁጥሮች)</label>
+                        <label class="option-label" id="lbl-q20-D"><input type="radio" name="q20" value="D" onclick="markAnswer(20)"> D) $y > 0$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q20">💡 <b>ማብራሪያ:</b> $y \geq 0$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q21">
+                    <div class="question-title">21. ኦንቶ (Onto / Surjective) ተግባር ባህሪ ትክክለኛው መግለጫ የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q21-A"><input type="radio" name="q21" value="A" onclick="markAnswer(21)"> A) ክልሉ (Range) ከኮ-ዴራይን (Co-domain) ጋር እኩል ሲሆን</label>
+                        <label class="option-label" id="lbl-q21-B"><input type="radio" name="q21" value="B" onclick="markAnswer(21)"> B) ግራፉ የተሰበረ መስመር ሲሆን</label>
+                        <label class="option-label" id="lbl-q21-C"><input type="radio" name="q21" value="C" onclick="markAnswer(21)"> C) ዴራይኑ ባዶ ሲሆን</label>
+                        <label class="option-label" id="lbl-q21-D"><input type="radio" name="q21" value="D" onclick="markAnswer(21)"> D) ኢንቨርስ የሌለው ሲሆን</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q21">💡 <b>ማብራሪያ:</b> ክልል ከኮ-ዴራይን ጋር እኩል ሲሆን።</div>
+                </div>
+
+                <div class="question-box" id="box-q22">
+                    <div class="question-title">22. $f(x) = x^2$ በሁሉም እውነተኛ ቁጥሮች ላይ ሲወሰን አንድ-ለ-አንድ (One-to-one) ነው ወይስ አይደለም?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q22-A"><input type="radio" name="q22" value="A" onclick="markAnswer(22)"> A) አዎ፣ አንድ-ለ-አንድ ነው።</label>
+                        <label class="option-label" id="lbl-q22-B"><input type="radio" name="q22" value="B" onclick="markAnswer(22)"> B) አይደለም (ምክንያቱም $f(-2) = f(2) = 4$ ስለሆነ)</label>
+                        <label class="option-label" id="lbl-q22-C"><input type="radio" name="q22" value="C" onclick="markAnswer(22)"> C) ኦንቶ ነው።</label>
+                        <label class="option-label" id="lbl-q22-D"><input type="radio" name="q22" value="D" onclick="markAnswer(22)"> D) ሊኒየር ነው።</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q22">💡 <b>ማብራሪያ:</b> አይደለም።</div>
+                </div>
+
+                <div class="question-box" id="box-q23">
+                    <div class="question-title">23. $f(x) = 5x - 3$ እና $f^{-1}(x) = \frac{x+3}{5}$ ቢሆኑ፣ የ $f(f^{-1}(10))$ እሴት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q23-A"><input type="radio" name="q23" value="A" onclick="markAnswer(23)"> A) 5</label>
+                        <label class="option-label" id="lbl-q23-B"><input type="radio" name="q23" value="B" onclick="markAnswer(23)"> B) 10</label>
+                        <label class="option-label" id="lbl-q23-C"><input type="radio" name="q23" value="C" onclick="markAnswer(23)"> C) 15</label>
+                        <label class="option-label" id="lbl-q23-D"><input type="radio" name="q23" value="D" onclick="markAnswer(23)"> D) 0</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q23">💡 <b>ማብራሪያ:</b> መልሱ 10 ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q24">
+                    <div class="question-title">24. የ $f(x) = \frac{2x+1}{x-3}$ ተግባር ዴራይን (Domain) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q24-A"><input type="radio" name="q24" value="A" onclick="markAnswer(24)"> A) $x \neq 0$</label>
+                        <label class="option-label" id="lbl-q24-B"><input type="radio" name="q24" value="B" onclick="markAnswer(24)"> B) $x \neq 3$</label>
+                        <label class="option-label" id="lbl-q24-C"><input type="radio" name="q24" value="C" onclick="markAnswer(24)"> C) $x \neq -\frac{1}{2}$</label>
+                        <label class="option-label" id="lbl-q24-D"><input type="radio" name="q24" value="D" onclick="markAnswer(24)"> D) ሁሉም እውነተኛ ቁጥሮች</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q24">💡 <b>ማብራሪያ:</b> $x \neq 3$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q25">
+                    <div class="question-title">25. የ $f(x) = \sqrt{9 - x^2}$ ተግባር ዴራይን (Domain) የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q25-A"><input type="radio" name="q25" value="A" onclick="markAnswer(25)"> A) $x \geq 3$</label>
+                        <label class="option-label" id="lbl-q25-B"><input type="radio" name="q25" value="B" onclick="markAnswer(25)"> B) $-3 \leq x \leq 3$</label>
+                        <label class="option-label" id="lbl-q25-C"><input type="radio" name="q25" value="C" onclick="markAnswer(25)"> C) $x \leq -3$ ወይም $x \geq 3$</label>
+                        <label class="option-label" id="lbl-q25-D"><input type="radio" name="q25" value="D" onclick="markAnswer(25)"> D) $x > 0$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q25">💡 <b>ማብራሪያ:</b> $-3 \leq x \leq 3$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q26">
+                    <div class="question-title">26. የኳድራቲክ ተግባር $f(x) = x^2 - 4x + 3$ አነስተኛ (Minimum) ዋጋ የሚገኝበት የ $x$ እሴት ስንት ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q26-A"><input type="radio" name="q26" value="A" onclick="markAnswer(26)"> A) $x = 2$</label>
+                        <label class="option-label" id="lbl-q26-B"><input type="radio" name="q26" value="B" onclick="markAnswer(26)"> B) $x = -2$</label>
+                        <label class="option-label" id="lbl-q26-C"><input type="radio" name="q26" value="C" onclick="markAnswer(26)"> C) $x = 4$</label>
+                        <label class="option-label" id="lbl-q26-D"><input type="radio" name="q26" value="D" onclick="markAnswer(26)"> D) $x = 3$</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q26">💡 <b>ማብራሪያ:</b> $x = 2$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q27">
+                    <div class="question-title">27. የኢንቨርስ ተግባር $f^{-1}$ ግራፍ ከኦርጂናሉ ተግባር $f$ ግራፍ ጋር በምን መስመር ላይ ይንጸባረቃል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q27-A"><input type="radio" name="q27" value="A" onclick="markAnswer(27)"> A) በ $x$-អክስስ (Axis)</label>
+                        <label class="option-label" id="lbl-q27-B"><input type="radio" name="q27" value="B" onclick="markAnswer(27)"> B) በ $y$-អክስስ</label>
+                        <label class="option-label" id="lbl-q27-C"><input type="radio" name="q27" value="C" onclick="markAnswer(27)"> C) በ መስመሩ $y = x$ ላይ</label>
+                        <label class="option-label" id="lbl-q27-D"><input type="radio" name="q27" value="D" onclick="markAnswer(27)"> D) በኦርጂን (Origin) ነጥብ</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q27">💡 <b>ማብራሪያ:</b> በ $y = x$ መስመር ላይ።</div>
+                </div>
+
+                <div class="question-box" id="box-q28">
+                    <div class="question-title">28. ሁለት ስብስቦች $A$ እና $B$ ካሉ እና $n(A) = 3$ እንዲሁም $n(B) = 4$ ከሆኑ, የካርቲዚያን ምርት $n(A \times B)$ ስንት ይሆናል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q28-A"><input type="radio" name="q28" value="A" onclick="markAnswer(28)"> A) 7</label>
+                        <label class="option-label" id="lbl-q28-B"><input type="radio" name="q28" value="B" onclick="markAnswer(28)"> B) 12</label>
+                        <label class="option-label" id="lbl-q28-C"><input type="radio" name="q28" value="C" onclick="markAnswer(28)"> C) 64</label>
+                        <label class="option-label" id="lbl-q28-D"><input type="radio" name="q28" value="D" onclick="markAnswer(28)"> D) 1</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q28">💡 <b>ማብራሪያ:</b> $3 \times 4 = 12$ ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q29">
+                    <div class="question-title">29. ከሚከተሉት መግለጫዎች መካከል ትክክለኛው የቱ ነው?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q29-A"><input type="radio" name="q29" value="A" onclick="markAnswer(29)"> A) ግንኙነት ሁሉ ተግባር ነው።</label>
+                        <label class="option-label" id="lbl-q29-B"><input type="radio" name="q29" value="B" onclick="markAnswer(29)"> B) ተግባር ሁሉ ግንኙነት ነው።</label>
+                        <label class="option-label" id="lbl-q29-C"><input type="radio" name="q29" value="C" onclick="markAnswer(29)"> C) የቋሚ ተግባር ዴራይን ባዶ ነው።</label>
+                        <label class="option-label" id="lbl-q29-D"><input type="radio" name="q29" value="D" onclick="markAnswer(29)"> D) የሊኒየር ተግባር ዴራይን አወንታዊ ብቻ ነው።</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q29">💡 <b>ማብራሪያ:</b> ተግባር ሁሉ ግንኙነት ነው።</div>
+                </div>
+
+                <div class="question-box" id="box-q30">
+                    <div class="question-title">30. የፈተና ውጤትዎ (Score) እና ትክክለኛው ምላሾች በራስ-ሰር እንዲሰሉ የሚረዳው ስርዓት ምን ይባላል?</div>
+                    <div class="options-group">
+                        <label class="option-label" id="lbl-q30-A"><input type="radio" name="q30" value="A" onclick="markAnswer(30)"> A) አውቶሜትድ ግሬዲንግ ሲስተም (Automated Grading)</label>
+                        <label class="option-label" id="lbl-q30-B"><input type="radio" name="q30" value="B" onclick="markAnswer(30)"> B) በእጅ ማረጋገጫ</label>
+                        <label class="option-label" id="lbl-q30-C"><input type="radio" name="q30" value="C" onclick="markAnswer(30)"> C) ቃል በቃል</label>
+                        <label class="option-label" id="lbl-q30-D"><input type="radio" name="q30" value="D" onclick="markAnswer(30)"> D) ባዶ ማስታወሻ</label>
+                    </div>
+                    <div class="explanation-box" id="exp-q30">💡 <b>ማብራሪያ:</b> አውቶሜትድ ግሬዲንግ ሲስተም ይባላል።</div>
+                </div>
+
+                <!-- የማስረከቢያ ቁልፍ -->
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="calculateScore()">ፈተናውን አስረክብ እና ውጤት ተመልከት</button>
+                </div>
+
+                <!-- የሰርተፍኬት እና ውጤት ማሳያ ሞዳል -->
+                <div id="result-modal">
+                    <h3 id="score-text"></h3>
+                    <p id="feedback-text" style="color: var(--text-muted); margin-top: 8px;"></p>
+                </div>
+
+            </form>
+
+            <!-- ፊርማ እና የባለቤትነት ማረጋገጫ -->
+            <div class="signature-section">
+                <div>
+                    <span class="signature-brand">በልዩ ዲዛይን የተዘጋጀው እና የታተመው በ:</span>
+                    <p style="color: var(--accent-gold-light); margin-top: 4px;">ናቲ (Nati) - Grade 10 Academic Creator</p>
+                </div>
+                <div>
+                    <p style="font-size: 12px; margin-bottom: 2px;">Digital Signature</p>
+                    <div class="signature-box">『𝐍†𝚝ⅈ』</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // የሰዓት ቆጣሪ ሎጂክ (30 ደቂቃ)
+        let timeLeft = 30 * 60;
+        const timerInterval = setInterval(() => {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById('timer').innerHTML = 
+                `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert('ሰዓትዎ አልቋል! ፈተናው በራስ-ሰር ይረከባል።');
+                calculateScore();
+            }
+            timeLeft--;
+        }, 1000);
+
+        // የጎን ማውጫ አዝራሮችን በራስ ሰር መፍጠር (1 እስከ 30)
+        const navGrid = document.getElementById('navGrid');
+        for (let i = 1; i <= 30; i++) {
+            let btn = document.createElement('div');
+            btn.className = 'nav-btn';
+            btn.id = `nav-q${i}`;
+            btn.innerText = i;
+            btn.onclick = () => {
+                document.getElementById(`box-q${i}`).scrollIntoView({ behavior: 'smooth' });
+            };
+            navGrid.appendChild(btn);
+        }
+
+        // ጥያቄ ሲመለስ ማውጫውን እና ፕሮግረስ ባሩን ማስተካከል
+        function markAnswer(qNum) {
+            document.getElementById(`nav-q${qNum}`).classList.add('answered');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let answeredCount = 0;
+            for (let i = 1; i <= 30; i++) {
+                if (document.querySelector(`input[name="q${i}"]:checked`)) {
+                    answeredCount++;
+                }
+            }
+            let percentage = (answeredCount / 30) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        const correctAnswers = {
+            q1: 'B', q2: 'B', q3: 'C', q4: 'A', q5: 'B',
+            q6: 'B', q7: 'C', q8: 'C', q9: 'A', q10: 'B',
+            q11: 'B', q12: 'B', q13: 'A', q14: 'B', q15: 'B',
+            q16: 'B', q17: 'C', q18: 'A', q19: 'A', q20: 'C',
+            q21: 'A', q22: 'B', q23: 'B', q24: 'B', q25: 'B',
+            q26: 'A', q27: 'C', q28: 'B', q29: 'B', q30: 'A'
+        };
+
+        function calculateScore() {
+            clearInterval(timerInterval);
+            let score = 0;
+            let total = 30;
+
+            for (let q in correctAnswers) {
+                let selected = document.querySelector(`input[name="${q}"]:checked`);
+                let correctVal = correctAnswers[q];
+                
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    let lbl = document.getElementById(`lbl-${q}-${opt}`);
+                    if (lbl) lbl.classList.remove('correct-ans', 'wrong-ans');
+                });
+
+                let expBox = document.getElementById(`exp-${q}`);
+                if (expBox) expBox.style.display = 'block';
+
+                let correctLbl = document.getElementById(`lbl-${q}-${correctVal}`);
+                if (correctLbl) correctLbl.classList.add('correct-ans');
+
+                if (selected) {
+                    if (selected.value === correctVal) {
+                        score++;
+                    } else {
+                        let wrongLbl = document.getElementById(`lbl-${q}-${selected.value}`);
+                        if (wrongLbl) wrongLbl.classList.add('wrong-ans');
+                    }
+                }
+            }
+
+            let modal = document.getElementById('result-modal');
+            let scoreText = document.getElementById('score-text');
+            let feedbackText = document.getElementById('feedback-text');
+
+            modal.style.display = 'block';
+            scoreText.innerHTML = `🏆 የውጤት ሰርተፍኬት፡ ${score} / ${total}`;
+            
+            if (score >= 25) {
+                feedbackText.innerHTML = "🌟 አስደናቂ ውጤት! የዩኒት 1 ፅንሰ-ሐሳቦችን ሙሉ በሙሉ ችለዋቸዋል።";
+            } else if (score >= 15) {
+                feedbackText.innerHTML = "👍 ጥሩ ጥረት! ማብራሪያዎቹን በመመልከት አሁንም ማሻሻል ይቻላል።";
+            } else {
+                feedbackText.innerHTML = "📚 ፅንሰ-ሐሳቦቹን በድጋሚ በመገምገም ማብራሪያዎቹን በጥንቃቄ ያንብቡ።";
+            }
+
+            modal.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
